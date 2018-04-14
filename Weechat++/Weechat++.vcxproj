@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BufferView.h" />
     <ClInclude Include="WndResizer.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Resource.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="WeechatView.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BufferView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="WndResizer.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -212,7 +214,10 @@
     <None Include="res\Weechat.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\menuimages.bmp" />
+    <Image Include="res\menuimages_hc.bmp" />
     <Image Include="res\Toolbar.bmp" />
+    <Image Include="res\Toolbar256.bmp" />
     <Image Include="res\Weechat++.ico" />
     <Image Include="res\Weechat++Doc.ico" />
   </ItemGroup>
