@@ -185,6 +185,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BufferCtrl.h" />
     <ClInclude Include="BufferView.h" />
     <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="NicklistView.h" />
@@ -198,6 +199,7 @@
     <ClInclude Include="WeechatView.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BufferCtrl.cpp" />
     <ClCompile Include="BufferView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ChildFrm.cpp" />
