@@ -184,6 +184,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BufferView.h" />
+    <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="WndResizer.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Resource.h" />
@@ -196,6 +197,7 @@
   <ItemGroup>
     <ClCompile Include="BufferView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="ChildFrm.cpp" />
     <ClCompile Include="WndResizer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -214,6 +216,7 @@
     <None Include="res\Weechat.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\info.bmp" />
     <Image Include="res\menuimages.bmp" />
     <Image Include="res\menuimages_hc.bmp" />
     <Image Include="res\Toolbar.bmp" />
