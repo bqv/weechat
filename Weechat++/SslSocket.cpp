@@ -829,7 +829,7 @@ SECURITY_STATUS CSslSocket::ClientHandshake(PCredHandle phCreds, const TCHAR *ps
     }
 
     if (OutBuffers[0].cbBuffer != 0 && OutBuffers[0].pvBuffer != NULL) {
-        DUMP(_T("CLIENT HELLO\n"), (BYTE*)OutBuffers[0].pvBuffer, OutBuffers[0].cbBuffer);
+        DUMP(_T("Client hello\n"), (BYTE*)OutBuffers[0].pvBuffer, OutBuffers[0].cbBuffer);
         m_bAllowPlainText = TRUE;
         cbData = Send(OutBuffers[0].pvBuffer, OutBuffers[0].cbBuffer);
         m_bAllowPlainText = FALSE;
@@ -1700,7 +1700,7 @@ void UsrDump(TCHAR *msg, BYTE *pData, int len)
 
         if (pData == NULL) return;
 
-        TRACE(msg);
+        TRACE(_T("%s\n"), msg);
         TRACE(_T("\nAddress:\t0x%.8x\nOffset\t\tData\n"), pData);
 
         CString str;
@@ -1719,7 +1719,7 @@ void UsrDump(TCHAR *msg, BYTE *pData, int len)
                 str += (TCHAR)13;
                 str += (TCHAR)10;
             }
-            TRACE("%s", str);
+            TRACE(_T("%s"), str);
             pData += 16;
         }
 
@@ -1755,7 +1755,7 @@ void UsrDump(TCHAR *msg, BYTE *pData, int len)
         if (c != 0) {
             str += numbers + spaces + chars + (TCHAR)13;
             str += (TCHAR)10;
-            TRACE("%s", str);
+            TRACE(_T("%s\n"), str);
         }
 
     }

@@ -3,13 +3,16 @@
 
 #include "RelaySocket.h"
 #include "RelaySslSocket.h"
+#include "Relay/Handler.h"
+#include "Relay/ISocket.h"
 
-class CRelayConnection
+class CRelayConnection : public ISocket
 {
 public:
-    CRelayConnection(CWnd* parent);
+    CRelayConnection(Handler* handler, CWnd* parent);
     virtual ~CRelayConnection();
 
+    Handler* m_pHandler;
     CWnd* m_pWnd;
     enum { PLAIN, SSL } m_type;
     union {
@@ -28,4 +31,3 @@ public:
     int Send(const void* lpBuf, int nBufLen, int nFlags = 0);
     void Close();
 };
-

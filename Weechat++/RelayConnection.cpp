@@ -3,8 +3,8 @@
 #include "RelayConnection.h"
 #include "MainFrm.h"
 
-CRelayConnection::CRelayConnection(CWnd* parent)
-    : m_pWnd(parent)
+CRelayConnection::CRelayConnection(Handler* handler, CWnd* parent)
+    : m_pHandler(handler), m_pWnd(parent)
 {
     m_plainSock = NULL;
     m_sslSock = NULL;
@@ -70,29 +70,80 @@ bool CRelayConnection::Ssl(CString host, UINT port)
 
 void CRelayConnection::OnConnect(int nErrorCode)
 {
+    if (nErrorCode == 0)
+    {
+        m_pHandler->onConnect();
+    }
+    else
+    {
 #ifdef DEBUG
-    m_pWnd->SendMessage(WM_SOCK_CONNECT, (LPARAM)&nErrorCode);
+        m_pWnd->SendMessage(WM_SOCK_ERROR, (LPARAM)&nErrorCode);
 #else
-    m_pWnd->PostMessage(WM_SOCK_CONNECT, (LPARAM)&nErrorCode);
+        m_pWnd->PostMessage(WM_SOCK_ERROR, (LPARAM)&nErrorCode);
 #endif
+        Close();
+    }
 }
 
 void CRelayConnection::OnClose(int nErrorCode)
 {
 #ifdef DEBUG
-    m_pWnd->SendMessage(WM_SOCK_CLOSE, (LPARAM)&nErrorCode);
+    m_pWnd->SendMessage(WM_SOCK_CLOSED, (LPARAM)&nErrorCode);
 #else
-    m_pWnd->PostMessage(WM_SOCK_CLOSE, (LPARAM)&nErrorCode);
+    m_pWnd->PostMessage(WM_SOCK_CLOSED, (LPARAM)&nErrorCode);
 #endif
 }
 
 void CRelayConnection::OnReceive(int nErrorCode)
 {
+    if (nErrorCode == 0)
+    {
+        char buff[4096];
+        int nRead;
+        nRead = Receive(buff, 4095);
+
+        switch (nRead)
+        {
+        case 0:
+            Close();
+            break;
+        case -1:
+            if (GetLastError() != WSAEWOULDBLOCK)
+            {
 #ifdef DEBUG
-    m_pWnd->SendMessage(WM_SOCK_RECEIVE, (LPARAM)&nErrorCode);
+                m_pWnd->SendMessage(WM_SOCK_ERROR, (LPARAM)&nErrorCode);
 #else
-    m_pWnd->PostMessage(WM_SOCK_RECEIVE, (LPARAM)&nErrorCode);
+                m_pWnd->PostMessage(WM_SOCK_ERROR, (LPARAM)&nErrorCode);
 #endif
+                Close();
+            }
+            break;
+        default:
+            buff[nRead] = '\0'; //terminate the string
+            /*
+            CFrameWnd* pFrame = MDIGetActive();
+            ASSERT(pFrame);
+            CDocument* pActiveDoc = pFrame->GetActiveDocument();
+            ASSERT(pActiveDoc->IsKindOf(RUNTIME_CLASS(CWeechatBuffer)));
+            CWeechatBuffer* pActiveBuffer = (CWeechatBuffer*)pActiveDoc;
+
+            CBufferLine line;
+            line.message = szTemp;
+            pActiveBuffer->AddLine(line);
+            AfxMessageBox(szTemp);
+            */
+            m_pHandler->onReceive(buff, nRead);
+        }
+    }
+    else
+    {
+#ifdef DEBUG
+        m_pWnd->SendMessage(WM_SOCK_ERROR, (LPARAM)&nErrorCode);
+#else
+        m_pWnd->PostMessage(WM_SOCK_ERROR, (LPARAM)&nErrorCode);
+#endif
+        Close();
+    }
 }
 
 int CRelayConnection::Receive(void* lpBuf, int nBufLen, int nFlags)
@@ -104,7 +155,7 @@ int CRelayConnection::Receive(void* lpBuf, int nBufLen, int nFlags)
     case SSL:
         return m_sslSock->Receive(lpBuf, nBufLen, nFlags);
     default:
-        ASSERT(0);
+        AfxThrowMemoryException();
         return -1;
     }
 }
@@ -125,6 +176,7 @@ int CRelayConnection::Send(const void* lpBuf, int nBufLen, int nFlags)
 
 void CRelayConnection::Close()
 {
+    m_pHandler->onClose();
     switch (m_type)
     {
     case PLAIN:
