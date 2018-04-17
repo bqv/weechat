@@ -63,3 +63,8 @@ void CChildFrame::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 // CChildFrame message handlers
+
+void CChildFrame::DoDataExchange(CDataExchange* pDX)
+{
+    CMDIChildWndEx::DoDataExchange(pDX);
+}

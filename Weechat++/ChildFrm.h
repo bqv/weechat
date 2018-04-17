@@ -13,6 +13,7 @@ public:
     // Attributes
 protected:
     CSplitterWndEx m_wndSplitter;
+
 public:
 
     // Operations
@@ -22,6 +23,7 @@ public:
 public:
     virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
     virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+    virtual void DoDataExchange(CDataExchange * pDX);
 
     // Implementation
 public:
