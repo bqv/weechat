@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <any>
+#include <variant>
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -21,6 +21,10 @@ struct inf_t;
 struct inl_t;
 struct arr_t;
 
+struct nul_t {};
+
+typedef std::variant<chr_t, int_t, lon_t, str_t, buf_t, ptr_t, tim_t, htb_t, hda_t, inf_t, inl_t, arr_t, nul_t> obj_t;
+
 struct _compare
 {
     bool operator()(const typ_t& lhs, const typ_t& rhs) const;
@@ -36,22 +40,27 @@ struct _compare
     bool operator()(const inf_t& lhs, const inf_t& rhs) const;
     bool operator()(const inl_t& lhs, const inl_t& rhs) const;
     bool operator()(const arr_t& lhs, const arr_t& rhs) const;
+    template<typename LHS, typename RHS>
+    bool operator()(const LHS& lhs, const RHS& rhs) const
+    {
+        throw std::runtime_error("Tried to compare values of unequal type");
+    }
 };
 
-struct _compare_any
+struct _compare_obj
 {
-    bool operator() (const std::any& a, const std::any& b) const;
+    bool operator() (const obj_t& a, const obj_t& b) const;
 };
 
-bool _compare_vec_any(const std::vector<std::any>& left, const std::vector<std::any>& right);
-bool _compare_pair_vec_any(const std::pair<std::vector<std::string>, std::vector<std::any>>& left, const std::pair<std::vector<std::string>, std::vector<std::any>>& right);
-bool _compare_pair_any(const std::pair<std::any, std::any>& left, const std::pair<std::any, std::any>& right);
-bool _compare_tuple_any(const std::tuple<std::string, std::string, std::any>& left, const std::tuple<std::string, std::string, std::any>& right);
-bool _pred_any(const std::any& left, const std::any& right);
-bool _pred_vec_any(const std::vector<std::any>& left, const std::vector<std::any>& right);
-bool _pred_pair_vec_any(const std::pair<std::vector<std::string>, std::vector<std::any>>& left, const std::pair<std::vector<std::string>, std::vector<std::any>>& right);
+bool _compare_vec_obj(const std::vector<obj_t>& left, const std::vector<obj_t>& right);
+bool _compare_pair_vec_obj(const std::pair<std::vector<std::string>, std::vector<obj_t>>& left, const std::pair<std::vector<std::string>, std::vector<obj_t>>& right);
+bool _compare_pair_obj(const std::pair<obj_t, obj_t>& left, const std::pair<obj_t, obj_t>& right);
+bool _compare_tuple_obj(const std::tuple<std::string, std::string, obj_t>& left, const std::tuple<std::string, std::string, obj_t>& right);
+bool _pred_obj(const obj_t& left, const obj_t& right);
+bool _pred_vec_obj(const std::vector<obj_t>& left, const std::vector<obj_t>& right);
+bool _pred_pair_vec_obj(const std::pair<std::vector<std::string>, std::vector<obj_t>>& left, const std::pair<std::vector<std::string>, std::vector<obj_t>>& right);
 
-const std::any read(const char type[3], std::istream& in);
+const obj_t read(const char type[3], std::istream& in);
 const std::string read_n(const size_t length, std::istream& in);
 
 struct typ_t
@@ -120,7 +129,7 @@ struct tim_t
 struct htb_t
 {
     static const char ID[3];
-    const std::map<std::any, std::any, _compare_any> data;
+    const std::map<obj_t, obj_t, _compare_obj> data;
 
     static const htb_t read(std::istream& in);
 };
@@ -130,7 +139,7 @@ struct hda_t
     static const char ID[3];
     const std::vector<std::string> hpath;
     const std::map<std::string, std::string> keys;
-    const std::vector<std::pair<std::vector<std::string>, std::vector<std::any>>> values;
+    const std::vector<std::pair<std::vector<std::string>, std::vector<obj_t>>> values;
 
     static const hda_t read(std::istream& in);
 };
@@ -148,7 +157,7 @@ struct inl_t
 {
     static const char ID[3];
     const std::string name;
-    const std::vector<std::tuple<std::string, std::string, std::any>> items;
+    const std::vector<std::tuple<std::string, std::string, obj_t>> items;
 
     static const inl_t read(std::istream& in);
 };
@@ -157,7 +166,7 @@ struct arr_t
 {
     static const char ID[3];
     const char type[3];
-    const std::vector<std::any> values;
+    const std::vector<obj_t> values;
 
     static const arr_t read(std::istream& in);
 };

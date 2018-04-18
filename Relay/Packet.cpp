@@ -12,7 +12,7 @@ Packet::Packet(std::string bytes)
     while (in.peek() != EOF)
     {
         std::string type = typ_t::read(in).data;
-        std::any object = ::read(type.c_str(), in);
+        obj_t object = ::read(type.c_str(), in);
         objects.push_back(object);
     }
 }

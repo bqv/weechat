@@ -2,8 +2,9 @@
 
 #include <string>
 #include <vector>
-#include <any>
 #include <optional>
+
+#include "Types.h"
 
 struct Packet
 {
@@ -12,5 +13,5 @@ struct Packet
     int length;
     bool compression;
     std::optional<std::string> id;
-    std::vector<std::any> objects;
+    std::vector<obj_t> objects;
 };

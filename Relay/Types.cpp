@@ -79,7 +79,7 @@ const tim_t tim_t::read(std::istream & in)
 const char htb_t::ID[3] = {'h','t','b'};
 const htb_t htb_t::read(std::istream & in)
 {
-    std::map<std::any, std::any, _compare_any> data;
+    std::map<obj_t, obj_t, _compare_obj> data;
 
     std::string keytype = typ_t::read(in).data;
     std::string valuetype = typ_t::read(in).data;
@@ -88,9 +88,9 @@ const htb_t htb_t::read(std::istream & in)
 
     while (count-- > 0)
     {
-        std::any key = ::read(keytype.c_str(), in);
-        std::any value = ::read(valuetype.c_str(), in);
-        std::pair<std::any, std::any> kvpair(key, value);
+        obj_t key = ::read(keytype.c_str(), in);
+        obj_t value = ::read(valuetype.c_str(), in);
+        std::pair<obj_t, obj_t> kvpair(key, value);
         data.insert(kvpair);
     }
 
@@ -104,7 +104,7 @@ const hda_t hda_t::read(std::istream & in)
 {
     std::vector<std::string> hpath;
     std::map<std::string, std::string> keys;
-    std::vector<std::pair<std::vector<std::string>, std::vector<std::any>>> values;
+    std::vector<std::pair<std::vector<std::string>, std::vector<obj_t>>> values;
 
     std::string hpath_str = str_t::read(in).data.value();
     auto hpath_begin = std::sregex_iterator(hpath_str.begin(), hpath_str.end(), HDATA_PATH_RGX);
@@ -137,7 +137,7 @@ const hda_t hda_t::read(std::istream & in)
     while (count-- > 0)
     {
         std::vector<std::string> ppath;
-        std::vector<std::any> vvalue;
+        std::vector<obj_t> vvalue;
 
         int n_paths = hpath.size();
 
@@ -152,7 +152,7 @@ const hda_t hda_t::read(std::istream & in)
             vvalue.push_back(::read(type.c_str(), in));
         }
 
-        std::pair<std::vector<std::string>, std::vector<std::any>> item(ppath, vvalue);
+        std::pair<std::vector<std::string>, std::vector<obj_t>> item(ppath, vvalue);
         values.push_back(item);
     }
 
@@ -171,7 +171,7 @@ const inf_t inf_t::read(std::istream & in)
 const char inl_t::ID[3] = {'i','n','l'};
 const inl_t inl_t::read(std::istream & in)
 {
-    std::vector<std::tuple<std::string, std::string, std::any>> items;
+    std::vector<std::tuple<std::string, std::string, obj_t>> items;
 
     std::string name = str_t::read(in).data.value();
     int count1 = int_t::read(in).data;
@@ -184,7 +184,7 @@ const inl_t inl_t::read(std::istream & in)
         {
             std::string name = str_t::read(in).data.value();
             std::string type = typ_t::read(in).data;
-            std::any value = ::read(type.c_str(), in);
+            obj_t value = ::read(type.c_str(), in);
 
             items.push_back(std::make_tuple(name, type, value));
         }
@@ -196,14 +196,14 @@ const inl_t inl_t::read(std::istream & in)
 const char arr_t::ID[3] = {'a','r','r'};
 const arr_t arr_t::read(std::istream & in)
 {
-    std::vector<std::any> objects;
+    std::vector<obj_t> objects;
 
     std::string type = typ_t::read(in).data;
     int count = int_t::read(in).data;
 
     while (count-- > 0)
     {
-        std::any value = ::read(type.c_str(), in);
+        obj_t value = ::read(type.c_str(), in);
 
         objects.push_back(value);
     }
@@ -211,14 +211,14 @@ const arr_t arr_t::read(std::istream & in)
     return { { type[0], type[1], type[2] }, objects };
 }
 
-const std::any read(const char type[3], std::istream & in)
+const obj_t read(const char type[3], std::istream & in)
 {
     switch (type[0])
     {
     case 'c':
         if (type[1] == 'h' && type[2] == 'r')
             return chr_t::read(in);
-        return std::any();
+        return nul_t();
     case 'i':
         if (type[1] == 'n')
             switch (type[2])
@@ -230,41 +230,41 @@ const std::any read(const char type[3], std::istream & in)
             case 'l':
                 return inl_t::read(in);
             default:
-                return std::any();
+                return nul_t();
             }
-        return std::any();
+        return nul_t();
     case 'l':
         if (type[1] == 'o' && type[2] == 'n')
             return lon_t::read(in);
-        return std::any();
+        return nul_t();
     case 's':
         if (type[1] == 't' && type[2] == 'r')
             return str_t::read(in);
-        return std::any();
+        return nul_t();
     case 'b':
         if (type[1] == 'u' && type[2] == 'f')
             return buf_t::read(in);
-        return std::any();
+        return nul_t();
     case 'p':
         if (type[1] == 't' && type[2] == 'r')
             return ptr_t::read(in);
-        return std::any();
+        return nul_t();
     case 't':
         if (type[1] == 'i' && type[2] == 'm')
             return tim_t::read(in);
-        return std::any();
+        return nul_t();
     case 'h':
         if (type[1] == 't' && type[2] == 'b')
             return htb_t::read(in);
         else if (type[1] == 'd' && type[2] == 'a')
             return hda_t::read(in);
-        return std::any();
+        return nul_t();
     case 'a':
         if (type[1] == 'r' && type[2] == 'r')
             return arr_t::read(in);
-        return std::any();
+        return nul_t();
     default:
-        return std::any();
+        return nul_t();
     }
 }
 
@@ -295,7 +295,7 @@ inline bool _compare::operator()(const tim_t& lhs, const tim_t& rhs) const
 { return lhs.data > rhs.data; }
 inline bool _compare::operator()(const htb_t& lhs, const htb_t& rhs) const
 {
-    return std::lexicographical_compare(lhs.data.begin(), lhs.data.end(), rhs.data.begin(), rhs.data.end(), _compare_pair_any);
+    return std::lexicographical_compare(lhs.data.begin(), lhs.data.end(), rhs.data.begin(), rhs.data.end(), _compare_pair_obj);
 }
 inline bool _compare::operator()(const hda_t& lhs, const hda_t& rhs) const
 {
@@ -303,10 +303,10 @@ inline bool _compare::operator()(const hda_t& lhs, const hda_t& rhs) const
     {
         if (lhs.keys == rhs.keys)
         {
-            if (lhs.values.size() == rhs.values.size() && std::equal(lhs.values.begin(), lhs.values.end(), rhs.values.begin(), _pred_pair_vec_any))
+            if (lhs.values.size() == rhs.values.size() && std::equal(lhs.values.begin(), lhs.values.end(), rhs.values.begin(), _pred_pair_vec_obj))
                 return false;
             else
-                return std::lexicographical_compare(lhs.values.begin(), lhs.values.end(), rhs.values.begin(), rhs.values.end(), _compare_pair_vec_any);
+                return std::lexicographical_compare(lhs.values.begin(), lhs.values.end(), rhs.values.begin(), rhs.values.end(), _compare_pair_vec_obj);
         }
         else
             return lhs.keys > rhs.keys;
@@ -331,7 +331,7 @@ inline bool _compare::operator()(const inl_t& lhs, const inl_t& rhs) const
 {
     if (lhs.name == rhs.name)
     {
-        return std::lexicographical_compare(lhs.items.begin(), lhs.items.end(), rhs.items.begin(), rhs.items.end(), _compare_tuple_any);
+        return std::lexicographical_compare(lhs.items.begin(), lhs.items.end(), rhs.items.begin(), rhs.items.end(), _compare_tuple_obj);
     }
     else
         return lhs.name > rhs.name;
@@ -340,58 +340,58 @@ inline bool _compare::operator()(const arr_t& lhs, const arr_t& rhs) const
 {
     if (lhs.type == rhs.type)
     {
-        if (lhs.values.size() == rhs.values.size() && std::equal(lhs.values.begin(), lhs.values.end(), rhs.values.begin(), _pred_any))
+        if (lhs.values.size() == rhs.values.size() && std::equal(lhs.values.begin(), lhs.values.end(), rhs.values.begin(), _pred_obj))
             return false;
         else
-            return std::lexicographical_compare(lhs.values.begin(), lhs.values.end(), rhs.values.begin(), rhs.values.end(), _compare_any());
+            return std::lexicographical_compare(lhs.values.begin(), lhs.values.end(), rhs.values.begin(), rhs.values.end(), _compare_obj());
     }
     else
         return lhs.type > rhs.type;
 }
 
-bool _compare_any::operator()(const std::any& a, const std::any& b) const
+bool _compare_obj::operator()(const obj_t& a, const obj_t& b) const
 {
-    if (a.type() == b.type())
-        return false;//std::visit(_compare(), a, b);
+    if (a.index() == b.index())
+        std::visit(_compare(), a, b);
     else
-        return a.type().hash_code() > b.type().hash_code();
+        return a.index() > b.index();
 }
 
-bool _compare_vec_any(const std::vector<std::any>& left, const std::vector<std::any>& right)
+bool _compare_vec_obj(const std::vector<obj_t>& left, const std::vector<obj_t>& right)
 {
-    _compare_any comparator;
+    _compare_obj comparator;
     return std::lexicographical_compare(left.begin(), left.end(), right.begin(), right.end(), comparator);
 }
 
-bool _compare_pair_vec_any(const std::pair<std::vector<std::string>, std::vector<std::any>>& left, const std::pair<std::vector<std::string>, std::vector<std::any>>& right)
+bool _compare_pair_vec_obj(const std::pair<std::vector<std::string>, std::vector<obj_t>>& left, const std::pair<std::vector<std::string>, std::vector<obj_t>>& right)
 {
-    return left.first == right.first && _compare_vec_any(left.second, right.second);
+    return left.first == right.first && _compare_vec_obj(left.second, right.second);
 }
 
-bool _compare_pair_any(const std::pair<std::any, std::any>& left, const std::pair<std::any, std::any>& right)
+bool _compare_pair_obj(const std::pair<obj_t, obj_t>& left, const std::pair<obj_t, obj_t>& right)
 {
-    _compare_any comparator;
+    _compare_obj comparator;
     return comparator(left.first, right.first) && comparator(left.second, right.second);
 }
 
-bool _compare_tuple_any(const std::tuple<std::string, std::string, std::any>& left, const std::tuple<std::string, std::string, std::any>& right)
+bool _compare_tuple_obj(const std::tuple<std::string, std::string, obj_t>& left, const std::tuple<std::string, std::string, obj_t>& right)
 {
-    _compare_any comparator;
+    _compare_obj comparator;
     return std::get<0>(left) > std::get<0>(right) && std::get<1>(left) > std::get<1>(right) && comparator(std::get<2>(left), std::get<2>(right));
 }
 
-bool _pred_any(const std::any& left, const std::any& right)
+bool _pred_obj(const obj_t& left, const obj_t& right)
 {
-    _compare_any comparator;
+    _compare_obj comparator;
     return comparator(left, right) == comparator(right, left);
 }
 
-bool _pred_vec_any(const std::vector<std::any>& left, const std::vector<std::any>& right)
+bool _pred_vec_obj(const std::vector<obj_t>& left, const std::vector<obj_t>& right)
 {
-    return left.size() == right.size() && std::equal(left.begin(), left.end(), right.begin(), _pred_any);
+    return left.size() == right.size() && std::equal(left.begin(), left.end(), right.begin(), _pred_obj);
 }
 
-bool _pred_pair_vec_any(const std::pair<std::vector<std::string>, std::vector<std::any>>& left, const std::pair<std::vector<std::string>, std::vector<std::any>>& right)
+bool _pred_pair_vec_obj(const std::pair<std::vector<std::string>, std::vector<obj_t>>& left, const std::pair<std::vector<std::string>, std::vector<obj_t>>& right)
 {
-    return left.first > right.first && _pred_vec_any(left.second, right.second);
+    return left.first > right.first && _pred_vec_obj(left.second, right.second);
 }
