@@ -154,10 +154,12 @@
     <ClInclude Include="Handler.h" />
     <ClInclude Include="ISocket.h" />
     <ClInclude Include="IRelayClient.h" />
+    <ClInclude Include="Packet.h" />
     <ClInclude Include="Types.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Handler.cpp" />
+    <ClCompile Include="Packet.cpp" />
     <ClCompile Include="Types.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
