@@ -38,7 +38,7 @@ int CNicklistView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     rectDummy.SetRectEmpty();
 
     // Create view:
-    const DWORD dwViewStyle = WS_CHILD | WS_VISIBLE;
+    const DWORD dwViewStyle = WS_CHILD | WS_VISIBLE | LVS_SMALLICON;
 
     if (!m_wndNicklistView.Create(dwViewStyle, rectDummy, this, 4))
     {
@@ -47,10 +47,10 @@ int CNicklistView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
 
     ///
-    m_wndNicklistView.AddString(_T("User1"));
-    m_wndNicklistView.AddString(_T("User2"));
-    m_wndNicklistView.AddString(_T("User3"));
-    m_wndNicklistView.AddString(_T("User4"));
+    m_wndNicklistView.InsertItem(0, _T("User1"));
+    m_wndNicklistView.InsertItem(1, _T("User2"));
+    m_wndNicklistView.InsertItem(2, _T("User3"));
+    m_wndNicklistView.InsertItem(3, _T("User4"));
     ///
     AdjustLayout();
 

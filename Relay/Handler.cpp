@@ -1,11 +1,28 @@
 #include <cstddef>
 
-#include "Handler.h"
 #include "Types.h"
+#include "Handler.h"
 #include "Packet.h"
+#include "Util.h"
 
-static const char MSG_QUIT[] = "quit\n";
-static const char MSG_INFOVER[] = "info version\n";
+using event_buffer_opened = hda_t;
+using event_buffer_moved = hda_t;
+using event_buffer_merged = hda_t;
+using event_buffer_unmerged = hda_t;
+using event_buffer_hidden = hda_t;
+using event_buffer_unhidden = hda_t;
+using event_buffer_renamed = hda_t;
+using event_buffer_title_changed = hda_t;
+using event_buffer_cleared = hda_t;
+using event_buffer_type_changed = hda_t;
+using event_buffer_localvar_added = hda_t;
+using event_buffer_localvar_changed = hda_t;
+using event_buffer_localvar_removed = hda_t;
+using event_buffer_line_added = hda_t;
+using event_buffer_closing = hda_t;
+using event_nicklist = hda_t;
+using event_nicklist_diff = hda_t;
+using event_pong = str_t;
 
 Handler::Handler(ISocket* pSocket, IRelayClient* pClient)
     : mSocket(pSocket), mClient(pClient)
@@ -31,46 +48,237 @@ void Handler::init(const char* pPassword, bool pCompression)
 
 void Handler::handle(Packet pPacket)
 {
+    if (pPacket.id)
+    {
+        unsigned long id = std::stoul(pPacket.id.value());
+        std::function<void(Packet* p)> callback = mCallbacks.at(id);
+        callback(&pPacket);
+    }
+}
+
+void Handler::registerCallback(unsigned long pIdx, std::function<void(Packet* p)> pCallback)
+{
+    mCallbacks.insert({ pIdx, pCallback });
 }
 
 void Handler::onConnect()
 {
     std::ostringstream ss_msg;
-    ss_msg << "(" << mIdx << ") init ";
+    ss_msg << '(' << mIdx++ << ") init ";
     ss_msg << "password=" << mPassword << ",";
     ss_msg << "compression=" << (mCompression ? "on" : "off") << "\n";
     std::string msg_init = ss_msg.str();
-    mSocket->Send(msg_init.c_str(), msg_init.size(), NULL);
-    mClient->OnConnected();
-    mSocket->Send(MSG_INFOVER, sizeof(MSG_INFOVER));
+    mSocket->Send(msg_init.c_str(), msg_init.size());
+    info("version", [this](Packet* p) {
+        inf_t info = std::get<inf_t>(p->objects[0]);
+        mClient->OnConnected(info.value.c_str());
+    });
 }
 
 void Handler::onClose()
 {
-    mSocket->Send(MSG_QUIT, sizeof(MSG_QUIT));
+    std::string msg_quit("quit\n");
+    mSocket->Send(msg_quit.c_str(), msg_quit.size());
 }
 
 void Handler::onReceive(const void* pBuffer, int pLength)
 {
     std::string data((char*)pBuffer, pLength);
     mStream.write(data.c_str(), data.length());
-    std::string len_str = mStream.str().substr(0, 4);
-    if (len_str.size() == 4)
+    const std::stringstream::pos_type start = mStream.tellg();
+    char bytes[4];
+    mStream.read(bytes, 4);
+    mStream.seekg(start);
+    uint32_t length = static_cast<uint32_t>(static_cast<unsigned char>(bytes[0]) << 24 |
+        static_cast<unsigned char>(bytes[1]) << 16 |
+        static_cast<unsigned char>(bytes[2]) << 8 |
+        static_cast<unsigned char>(bytes[3]));
+    uint32_t bufLength = mStream.tellp() - mStream.tellg();
+    if (length <= bufLength && mStream.gcount() == 4)
     {
-        std::istringstream in(len_str);
-        unsigned int len = int_t::read(in).data;
+        char* bytes = new char[length];
+        mStream.read(bytes, length);
 
-        if (mStream.str().size() >= len)
+        if (mStream.gcount() == length)
         {
-            char* bytes = new char[len];
+            std::string bytestring(bytes, length);
+            try
+            {
+                Packet packet(bytestring);
+                handle(packet);
+            }
+            catch (std::invalid_argument)
+            {
+                mClient->OnProtocolError();
+            }
+        }
+        else
+        {
+            mStream.seekg(start);
+        }
+        
+        delete[] bytes;
+    }
+}
 
-            mStream.read(bytes, len);
-            std::string bytestring(bytes, len);
-            Packet packet(bytestring);
+void Handler::hdatasync(std::string pHdata, std::string pPointer, std::vector<std::string> pVars, std::vector<std::string> pKeys, std::vector<std::string> pBuffers, std::vector<std::string> pOptions, std::function<void(Packet*p)> pCallback)
+{
+    registerCallback(mIdx, pCallback);
+    std::ostringstream ss_msg;
+    ss_msg << '(' << mIdx++ << ") hdata " << pHdata << ':' << pPointer;
+    for (const std::string& var : pVars)
+    {
+        ss_msg << '/' << var;
+    }
+    if (!pKeys.empty())
+    {
+        ss_msg << ' ' << Util::join(pKeys, ",");
+    }
+    ss_msg << "\nsync";
+    if (!pBuffers.empty())
+    {
+        ss_msg << ' ' << Util::join(pBuffers, ",");
+    }
+    else if (!pOptions.empty())
+    {
+        ss_msg << " *";
+    }
+    if (!pOptions.empty())
+    {
+        ss_msg << ' ' << Util::join(pOptions, ",");
+    }
+    ss_msg << "\n";
+    std::string msg_hdatasync = ss_msg.str();
+    mSocket->Send(msg_hdatasync.c_str(), msg_hdatasync.size());
+}
 
-            delete[] bytes;
+void Handler::hdata(std::string pHdata, std::string pPointer, std::vector<std::string> pVars, std::vector<std::string> pKeys, std::function<void(Packet* p)> pCallback)
+{
+    registerCallback(mIdx, pCallback);
+    std::ostringstream ss_msg;
+    ss_msg << '(' << mIdx++ << ") hdata " << pHdata << ':' << pPointer;
+    for (const std::string& var : pVars)
+    {
+        ss_msg << '/' << var;
+    }
+    if (!pKeys.empty())
+    {
+        ss_msg << ' ' << Util::join(pKeys, ",");
+    }
+    ss_msg << "\n";
+    std::string msg_hdata = ss_msg.str();
+    mSocket->Send(msg_hdata.c_str(), msg_hdata.size());
+}
 
-            handle(packet);
+void Handler::info(std::string pName, std::function<void(Packet* p)> pCallback)
+{
+    registerCallback(mIdx, pCallback);
+    std::ostringstream ss_msg;
+    ss_msg << '(' << mIdx++ << ") info " << pName << "\n";
+    std::string msg_info = ss_msg.str();
+    mSocket->Send(msg_info.c_str(), msg_info.size());
+}
+
+void Handler::infolist(std::string pName, std::string pPointer, std::vector<std::string> pArgs, std::function<void(Packet* p)> pCallback)
+{
+    registerCallback(mIdx, pCallback);
+    std::ostringstream ss_msg;
+    ss_msg << '(' << mIdx++ << ") infolist " << pName;
+    if (!pPointer.empty())
+    {
+        ss_msg << ' ' << pPointer;
+        
+        if (!pArgs.empty())
+        {
+            ss_msg << ' ' << Util::join(pArgs, ",");
         }
     }
+    ss_msg << "\n";
+    std::string msg_infolist = ss_msg.str();
+    mSocket->Send(msg_infolist.c_str(), msg_infolist.size());
+}
+
+void Handler::nicklist(std::string pBuffer, std::function<void(Packet* p)> pCallback)
+{
+    registerCallback(mIdx, pCallback);
+    std::ostringstream ss_msg;
+    ss_msg << '(' << mIdx++ << ") nicklist";
+    if (!pBuffer.empty())
+    {
+        ss_msg << ' ' << pBuffer;
+    }
+    ss_msg << "\n";
+    std::string msg_nicklist = ss_msg.str();
+    mSocket->Send(msg_nicklist.c_str(), msg_nicklist.size());
+}
+
+void Handler::input(std::string pBuffer, std::string pData)
+{
+    std::ostringstream ss_msg;
+    ss_msg << "input " << pBuffer << ' ' << pData << "\n";
+    std::string msg_input = ss_msg.str();
+    mSocket->Send(msg_input.c_str(), msg_input.size());
+}
+
+void Handler::sync(std::vector<std::string> pBuffers, std::vector<std::string> pOptions)
+{
+    std::ostringstream ss_msg;
+    ss_msg << "sync";
+    if (!pBuffers.empty())
+    {
+        ss_msg << ' ' << Util::join(pBuffers, ",");
+    }
+    else if (!pOptions.empty())
+    {
+        ss_msg << " *";
+    }
+    if (!pOptions.empty())
+    {
+        ss_msg << ' ' << Util::join(pOptions, ",");
+    }
+    ss_msg << "\n";
+    std::string msg_sync = ss_msg.str();
+    mSocket->Send(msg_sync.c_str(), msg_sync.size());
+}
+
+void Handler::desync(std::vector<std::string> pBuffers, std::vector<std::string> pOptions)
+{
+    std::ostringstream ss_msg;
+    ss_msg << "desync";
+    if (!pBuffers.empty())
+    {
+        ss_msg << ' ' << Util::join(pBuffers, ",");
+    }
+    else if (!pOptions.empty())
+    {
+        ss_msg << " *";
+    }
+    if (!pOptions.empty())
+    {
+        ss_msg << ' ' << Util::join(pOptions, ",");
+    }
+    ss_msg << "\n";
+    std::string msg_desync = ss_msg.str();
+    mSocket->Send(msg_desync.c_str(), msg_desync.size());
+}
+
+void Handler::test()
+{
+    std::string msg_test("test\n");
+    mSocket->Send(msg_test.c_str(), msg_test.size());
+}
+
+void Handler::ping(std::string args)
+{
+    std::ostringstream ss_msg;
+    ss_msg << "ping " << args << "\n";
+    std::string msg_ping = ss_msg.str();
+    mSocket->Send(msg_ping.c_str(), msg_ping.size());
+}
+
+void Handler::quit()
+{
+    std::string msg_quit("quit\n");
+    mSocket->Send(msg_quit.c_str(), msg_quit.size());
+    mSocket->Close();
 }

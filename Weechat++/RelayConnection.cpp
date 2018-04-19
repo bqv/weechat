@@ -98,42 +98,38 @@ void CRelayConnection::OnReceive(int nErrorCode)
 {
     if (nErrorCode == 0)
     {
-        char buff[4096];
+        CArray<BYTE> data;
+        CArray<BYTE> buff;
+        buff.SetSize(4096, 1);
         int nRead;
-        nRead = Receive(buff, 4095);
-
-        switch (nRead)
+        while ((nRead = Receive(buff.GetData(), 4096)) > 0)
         {
-        case 0:
-            Close();
-            break;
-        case -1:
-            if (GetLastError() != WSAEWOULDBLOCK)
+            switch (nRead)
             {
-#ifdef DEBUG
-                m_pWnd->SendMessage(WM_SOCK_ERROR, (LPARAM)&nErrorCode);
-#else
-                m_pWnd->PostMessage(WM_SOCK_ERROR, (LPARAM)&nErrorCode);
-#endif
+            case 0:
                 Close();
+                break;
+            case SOCKET_ERROR:
+                if ((nErrorCode = GetLastError()) != WSAEWOULDBLOCK)
+                {
+#ifdef DEBUG
+                    m_pWnd->SendMessage(WM_SOCK_ERROR, (LPARAM)&nErrorCode);
+#else
+                    m_pWnd->PostMessage(WM_SOCK_ERROR, (LPARAM)&nErrorCode);
+#endif
+                    Close();
+                    return;
+                }
+                else // WSAEWOULDBLOCK
+                {
+                    break;
+                }
+            default:
+                buff.SetSize(nRead);
+                data.Append(buff);
             }
-            break;
-        default:
-            buff[nRead] = '\0'; //terminate the string
-            /*
-            CFrameWnd* pFrame = MDIGetActive();
-            ASSERT(pFrame);
-            CDocument* pActiveDoc = pFrame->GetActiveDocument();
-            ASSERT(pActiveDoc->IsKindOf(RUNTIME_CLASS(CWeechatBuffer)));
-            CWeechatBuffer* pActiveBuffer = (CWeechatBuffer*)pActiveDoc;
-
-            CBufferLine line;
-            line.message = szTemp;
-            pActiveBuffer->AddLine(line);
-            AfxMessageBox(szTemp);
-            */
-            m_pHandler->onReceive(buff, nRead);
         }
+        m_pHandler->onReceive(data.GetData(), data.GetCount());
     }
     else
     {

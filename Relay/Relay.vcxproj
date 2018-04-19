@@ -156,11 +156,13 @@
     <ClInclude Include="IRelayClient.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Handler.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="Types.cpp" />
+    <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

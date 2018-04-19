@@ -12,7 +12,7 @@ public:
     // Attributes
 protected:
 
-    CListBox m_wndNicklistView;
+    CMFCListCtrl m_wndNicklistView;
 
     // Implementation
 public:

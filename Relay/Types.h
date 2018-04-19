@@ -1,5 +1,11 @@
 #pragma once
 
+#if defined(WIN32) && defined(_DEBUG)
+#include <SDKDDKVer.h>
+#include <afx.h>
+#define new DEBUG_NEW
+#endif
+
 #include <string>
 #include <variant>
 #include <map>
@@ -44,6 +50,7 @@ struct _compare
     bool operator()(const LHS& lhs, const RHS& rhs) const
     {
         throw std::runtime_error("Tried to compare values of unequal type");
+        return false;
     }
 };
 
@@ -60,14 +67,14 @@ bool _pred_obj(const obj_t& left, const obj_t& right);
 bool _pred_vec_obj(const std::vector<obj_t>& left, const std::vector<obj_t>& right);
 bool _pred_pair_vec_obj(const std::pair<std::vector<std::string>, std::vector<obj_t>>& left, const std::pair<std::vector<std::string>, std::vector<obj_t>>& right);
 
-const obj_t read(const char type[3], std::istream& in);
+const obj_t read(const char type[3], std::istream& in, size_t& maxLen, int depth = 0);
 const std::string read_n(const size_t length, std::istream& in);
 
 struct typ_t
 {
     const char data[3];
 
-    static const typ_t read(std::istream& in);
+    static const typ_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct chr_t
@@ -75,7 +82,7 @@ struct chr_t
     static const char ID[3];
     const char data;
 
-    static const chr_t read(std::istream& in);
+    static const chr_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct int_t
@@ -83,7 +90,7 @@ struct int_t
     static const char ID[3];
     const int data;
 
-    static const int_t read(std::istream& in);
+    static const int_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct lon_t
@@ -91,7 +98,7 @@ struct lon_t
     static const char ID[3];
     const long data;
 
-    static const lon_t read(std::istream& in);
+    static const lon_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct str_t
@@ -99,7 +106,7 @@ struct str_t
     static const char ID[3];
     const std::optional<std::string> data;
 
-    static const str_t read(std::istream& in);
+    static const str_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct buf_t
@@ -107,7 +114,7 @@ struct buf_t
     static const char ID[3];
     const std::optional<std::string> data;
 
-    static const buf_t read(std::istream& in);
+    static const buf_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct ptr_t
@@ -115,7 +122,7 @@ struct ptr_t
     static const char ID[3];
     const std::string data;
 
-    static const ptr_t read(std::istream& in);
+    static const ptr_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct tim_t
@@ -123,7 +130,7 @@ struct tim_t
     static const char ID[3];
     const unsigned long data;
 
-    static const tim_t read(std::istream& in);
+    static const tim_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct htb_t
@@ -131,17 +138,17 @@ struct htb_t
     static const char ID[3];
     const std::map<obj_t, obj_t, _compare_obj> data;
 
-    static const htb_t read(std::istream& in);
+    static const htb_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct hda_t
 {
     static const char ID[3];
     const std::vector<std::string> hpath;
-    const std::map<std::string, std::string> keys;
+    const std::vector<std::pair<std::string, std::string>> keys;
     const std::vector<std::pair<std::vector<std::string>, std::vector<obj_t>>> values;
 
-    static const hda_t read(std::istream& in);
+    static const hda_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct inf_t
@@ -150,7 +157,7 @@ struct inf_t
     const std::string name;
     const std::string value;
 
-    static const inf_t read(std::istream& in);
+    static const inf_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct inl_t
@@ -159,7 +166,7 @@ struct inl_t
     const std::string name;
     const std::vector<std::tuple<std::string, std::string, obj_t>> items;
 
-    static const inl_t read(std::istream& in);
+    static const inl_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
 
 struct arr_t
@@ -168,5 +175,5 @@ struct arr_t
     const char type[3];
     const std::vector<obj_t> values;
 
-    static const arr_t read(std::istream& in);
+    static const arr_t read(std::istream& in, size_t& maxLen, int depth = 0);
 };
