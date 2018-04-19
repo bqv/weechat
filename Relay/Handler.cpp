@@ -55,7 +55,7 @@ void Handler::handle(Packet pPacket)
         {
             id = std::stoul(pPacket.id.value());
         }
-        catch (std::invalid_argument& e)
+        catch (std::invalid_argument&)
         {
             mClient->OnMessage(pPacket);
             return;
@@ -120,7 +120,7 @@ void Handler::onReceive(const void* pBuffer, int pLength)
                 Packet packet(bytestring);
                 handle(packet);
             }
-            catch (std::invalid_argument& e)
+            catch (std::invalid_argument&)
             {
                 mClient->OnProtocolError();
                 throw;
@@ -147,7 +147,7 @@ void Handler::hdatasync(std::string pHdata, std::string pPointer, std::vector<st
     if (!pKeys.empty())
     {
         ss_msg << ' ' << Util::join(pKeys, ",");
-    }
+    }/*
     ss_msg << "\nsync";
     if (!pBuffers.empty())
     {
@@ -160,7 +160,7 @@ void Handler::hdatasync(std::string pHdata, std::string pPointer, std::vector<st
     if (!pOptions.empty())
     {
         ss_msg << ' ' << Util::join(pOptions, ",");
-    }
+    }*/
     ss_msg << "\n";
     std::string msg_hdatasync = ss_msg.str();
     mSocket->Send(msg_hdatasync.c_str(), msg_hdatasync.size());

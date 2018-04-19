@@ -11,7 +11,10 @@
 
 #define HDATA_BUFFER "buffer"
 #define HDATA_LINE_DATA "line_data"
-#define GUI_BUFFERS "gui_buffers"
+#define VAR_LINES "lines"
+#define VAR_FIRST_LINE "first_line"
+#define VAR_DATA "data"
+#define PTR_GUI_BUFFERS "gui_buffers"
 #define BUFFER_POINTER "pointer"
 #define BUFFER_NUMBER "number"
 #define BUFFER_NAME "name"

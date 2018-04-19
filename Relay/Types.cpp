@@ -123,7 +123,7 @@ const ptr_t ptr_t::read(std::istream & in, size_t& maxLen, int depth)
 #if defined(WIN32) && defined(_DEBUG)
     TRACE(_T("%sPointer: 0x%s\n"), CString(' ', depth).GetString(), CString(result.c_str()));
 #endif
-    return { result };
+    return { "0x" + result };
 }
 
 const char tim_t::ID[3] = {'t','i','m'};
@@ -145,8 +145,8 @@ const htb_t htb_t::read(std::istream & in, size_t& maxLen, int depth)
 {
     std::map<obj_t, obj_t, _compare_obj> data;
 
-    std::string keytype = typ_t::read(in, maxLen, depth+1).data;
-    std::string valuetype = typ_t::read(in, maxLen, depth+1).data;
+    std::string keytype(typ_t::read(in, maxLen, depth+1).data, 3);
+    std::string valuetype(typ_t::read(in, maxLen, depth+1).data, 3);
 
     int count = int_t::read(in, maxLen, depth+1).data;
 
@@ -159,7 +159,7 @@ const htb_t htb_t::read(std::istream & in, size_t& maxLen, int depth)
     }
 
 #if defined(WIN32) && defined(_DEBUG)
-    TRACE(_T("%sHashtable: <%s, %s>\n"), CString(' ', depth).GetString(), CString(keytype.c_str()), CString(valuetype.c_str()));
+    TRACE(_T("%sHashtable: <%s, %s>\n"), CString(' ', depth).GetString(), CString(keytype.c_str(), 3), CString(valuetype.c_str(), 3));
 #endif
     return { data };
 }
