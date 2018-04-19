@@ -41,9 +41,10 @@ BOOL CChildFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 
 BOOL CChildFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
-    // TODO: Modify the Window class or styles here by modifying the CREATESTRUCT cs
     if (!CMDIChildWndEx::PreCreateWindow(cs))
         return FALSE;
+
+    cs.style &= ~FWS_ADDTOTITLE;
 
     return TRUE;
 }
