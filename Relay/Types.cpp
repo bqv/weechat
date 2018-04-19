@@ -474,3 +474,68 @@ bool _pred_pair_vec_obj(const std::pair<std::vector<std::string>, std::vector<ob
 {
     return left.first > right.first && _pred_vec_obj(left.second, right.second);
 }
+
+const char * ID::operator()(const chr_t & lhs) const
+{
+    return chr_t::ID;
+}
+
+const char * ID::operator()(const int_t & lhs) const
+{
+    return int_t::ID;
+}
+
+const char * ID::operator()(const lon_t & lhs) const
+{
+    return lon_t::ID;
+}
+
+const char * ID::operator()(const str_t & lhs) const
+{
+    return str_t::ID;
+}
+
+const char * ID::operator()(const buf_t & lhs) const
+{
+    return buf_t::ID;
+}
+
+const char * ID::operator()(const ptr_t & lhs) const
+{
+    return ptr_t::ID;
+}
+
+const char * ID::operator()(const tim_t & lhs) const
+{
+    return tim_t::ID;
+}
+
+const char * ID::operator()(const htb_t & lhs) const
+{
+    return htb_t::ID;
+}
+
+const char * ID::operator()(const hda_t & lhs) const
+{
+    return hda_t::ID;
+}
+
+const char * ID::operator()(const inf_t & lhs) const
+{
+    return inf_t::ID;
+}
+
+const char * ID::operator()(const inl_t & lhs) const
+{
+    return inl_t::ID;
+}
+
+const char * ID::operator()(const arr_t & lhs) const
+{
+    return arr_t::ID;
+}
+
+const char * ID::operator()(const nul_t & lhs) const
+{
+    return nullptr;
+}

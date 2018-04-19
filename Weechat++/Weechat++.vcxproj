@@ -251,6 +251,9 @@
     <Image Include="res\Weechat++Doc.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MetaStuff\MetaStuff.vcxproj">
+      <Project>{7c882266-90ba-4dd1-b170-bd0491d2f81f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Relay\Relay.vcxproj">
       <Project>{a955c5ac-4f0a-48c1-a28f-7c1a683e6b20}</Project>
     </ProjectReference>

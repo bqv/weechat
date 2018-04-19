@@ -31,6 +31,23 @@ struct nul_t {};
 
 typedef std::variant<chr_t, int_t, lon_t, str_t, buf_t, ptr_t, tim_t, htb_t, hda_t, inf_t, inl_t, arr_t, nul_t> obj_t;
 
+struct ID
+{
+    const char* operator()(const chr_t& lhs) const;
+    const char* operator()(const int_t& lhs) const;
+    const char* operator()(const lon_t& lhs) const;
+    const char* operator()(const str_t& lhs) const;
+    const char* operator()(const buf_t& lhs) const;
+    const char* operator()(const ptr_t& lhs) const;
+    const char* operator()(const tim_t& lhs) const;
+    const char* operator()(const htb_t& lhs) const;
+    const char* operator()(const hda_t& lhs) const;
+    const char* operator()(const inf_t& lhs) const;
+    const char* operator()(const inl_t& lhs) const;
+    const char* operator()(const arr_t& lhs) const;
+    const char* operator()(const nul_t& lhs) const;
+};
+
 struct _compare
 {
     bool operator()(const typ_t& lhs, const typ_t& rhs) const;
