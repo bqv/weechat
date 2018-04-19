@@ -194,6 +194,7 @@
     <ClInclude Include="BufferView.h" />
     <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="ConnectDlg.h" />
+    <ClInclude Include="Hash.h" />
     <ClInclude Include="InputCtrl.h" />
     <ClInclude Include="RelayConnection.h" />
     <ClInclude Include="RelaySslSocket.h" />

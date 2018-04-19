@@ -48,11 +48,24 @@ void Handler::init(const char* pPassword, bool pCompression)
 
 void Handler::handle(Packet pPacket)
 {
-    if (pPacket.id)
+    if (pPacket.id && pPacket.id.value().compare(0,1,"_") != 0)
     {
-        unsigned long id = std::stoul(pPacket.id.value());
+        unsigned long id;
+        try
+        {
+            id = std::stoul(pPacket.id.value());
+        }
+        catch (std::invalid_argument& e)
+        {
+            mClient->OnMessage(pPacket);
+            return;
+        }
         std::function<void(Packet* p)> callback = mCallbacks.at(id);
         callback(&pPacket);
+    }
+    else
+    {
+        mClient->OnMessage(pPacket);
     }
 }
 
@@ -93,7 +106,7 @@ void Handler::onReceive(const void* pBuffer, int pLength)
         static_cast<unsigned char>(bytes[1]) << 16 |
         static_cast<unsigned char>(bytes[2]) << 8 |
         static_cast<unsigned char>(bytes[3]));
-    uint32_t bufLength = mStream.tellp() - mStream.tellg();
+    uint32_t bufLength = (uint32_t)(mStream.tellp() - mStream.tellg());
     if (length <= bufLength && mStream.gcount() == 4)
     {
         char* bytes = new char[length];
@@ -107,9 +120,10 @@ void Handler::onReceive(const void* pBuffer, int pLength)
                 Packet packet(bytestring);
                 handle(packet);
             }
-            catch (std::invalid_argument)
+            catch (std::invalid_argument& e)
             {
                 mClient->OnProtocolError();
+                throw;
             }
         }
         else

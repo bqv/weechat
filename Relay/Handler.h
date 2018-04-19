@@ -10,6 +10,7 @@
 #include "ISocket.h"
 
 #define HDATA_BUFFER "buffer"
+#define HDATA_LINE_DATA "line_data"
 #define GUI_BUFFERS "gui_buffers"
 #define BUFFER_POINTER "pointer"
 #define BUFFER_NUMBER "number"
@@ -22,6 +23,16 @@
 #define BUFFER_PREVBUFFER "prevbuffer"
 #define BUFFER_NEXTBUFFER "nextbuffer"
 #define BUFFER_TYPE "type"
+#define LINE_DATA_BUFFER "buffer"
+#define LINE_DATA_DATE "date"
+#define LINE_DATA_DATE_PRINTED "date_printed"
+#define LINE_DATA_DISPLAYED "displayed"
+#define LINE_DATA_HIGHLIGHT "highlight"
+#define LINE_DATA_TAGS_ARRAY "tags_array"
+#define LINE_DATA_PREFIX "prefix"
+#define LINE_DATA_MESSAGE "message"
+#define SYNC_BUFFERS "buffers"
+#define SYNC_UPGRADE "upgrade"
 
 struct Packet;
 
