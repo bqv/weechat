@@ -21,8 +21,7 @@ const chr_t chr_t::read(std::istream & in, size_t& maxLen, int depth)
 {
     if (maxLen < (size_t)1)
         throw std::invalid_argument("Protocol Error");
-    char data;
-    in >> data;
+    char data = ::read_n(1, in)[0];
     maxLen -= 1;
 #if defined(WIN32) && defined(_DEBUG)
     TRACE(_T("%sChar: '%c' : 0x%02X\n"), CString(' ', depth).GetString(), CString((wchar_t)data, 1), data);
@@ -73,7 +72,14 @@ const str_t str_t::read(std::istream & in, size_t& maxLen, int depth)
         return { std::optional<std::string>() };
     }
     if (maxLen < (size_t)length)
+    {
+        std::istream::pos_type pos = in.tellg();
+        in.seekg(-4, in.cur);
+        char data[64] = { 0 };
+        in.read(data, 64);
+        in.seekg(pos);
         throw std::invalid_argument("Protocol Error");
+    }
     std::string result = ::read_n(length, in);
     maxLen -= length;
 #if defined(WIN32) && defined(_DEBUG)

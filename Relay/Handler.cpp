@@ -24,6 +24,29 @@ using event_nicklist = hda_t;
 using event_nicklist_diff = hda_t;
 using event_pong = str_t;
 
+const std::map<std::string, char> Handler::RESERVED = {
+    {"_buffer_opened", EVENT_BUFFER_OPENED},
+    {"_buffer_type_changed", EVENT_BUFFER_TYPE_CHANGED},
+    {"_buffer_moved", EVENT_BUFFER_MOVED},
+    {"_buffer_merged", EVENT_BUFFER_MERGED},
+    {"_buffer_unmerged", EVENT_BUFFER_UNMERGED},
+    {"_buffer_hidden", EVENT_BUFFER_HIDDEN},
+    {"_buffer_unhidden", EVENT_BUFFER_UNHIDDEN},
+    {"_buffer_renamed", EVENT_BUFFER_RENAMED},
+    {"_buffer_title_changed", EVENT_BUFFER_TITLE_CHANGED},
+    {"_buffer_localvar_added", EVENT_BUFFER_LOCALVAR_ADDED},
+    {"_buffer_localvar_changed", EVENT_BUFFER_LOCALVAR_CHANGED},
+    {"_buffer_localvar_removed", EVENT_BUFFER_LOCALVAR_REMOVED},
+    {"_buffer_closing", EVENT_BUFFER_CLOSING},
+    {"_buffer_cleared", EVENT_BUFFER_CLEARED},
+    {"_buffer_line_added", EVENT_BUFFER_LINE_ADDED},
+    {"_nicklist", EVENT_NICKLIST},
+    {"_nicklist_diff", EVENT_NICKLIST_DIFF},
+    {"_pong", EVENT_PONG},
+    {"_upgrade", EVENT_UPGRADE},
+    {"_upgrade_ended", EVENT_UPGRADE_ENDED}
+};
+
 Handler::Handler(ISocket* pSocket, IRelayClient* pClient)
     : mSocket(pSocket), mClient(pClient)
 {
@@ -60,8 +83,15 @@ void Handler::handle(Packet pPacket)
             mClient->OnMessage(pPacket);
             return;
         }
-        std::function<void(Packet* p)> callback = mCallbacks.at(id);
-        callback(&pPacket);
+        try
+        {
+            std::function<void(Packet* p)> callback = mCallbacks.at(id);
+            callback(&pPacket);
+        }
+        catch (std::out_of_range&)
+        {
+            mClient->OnMessage(pPacket);
+        }
     }
     else
     {
@@ -147,7 +177,7 @@ void Handler::hdatasync(std::string pHdata, std::string pPointer, std::vector<st
     if (!pKeys.empty())
     {
         ss_msg << ' ' << Util::join(pKeys, ",");
-    }/*
+    }
     ss_msg << "\nsync";
     if (!pBuffers.empty())
     {
@@ -160,7 +190,7 @@ void Handler::hdatasync(std::string pHdata, std::string pPointer, std::vector<st
     if (!pOptions.empty())
     {
         ss_msg << ' ' << Util::join(pOptions, ",");
-    }*/
+    }
     ss_msg << "\n";
     std::string msg_hdatasync = ss_msg.str();
     mSocket->Send(msg_hdatasync.c_str(), msg_hdatasync.size());
