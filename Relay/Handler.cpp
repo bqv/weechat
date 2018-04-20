@@ -109,7 +109,7 @@ void Handler::onConnect()
     std::ostringstream ss_msg;
     ss_msg << '(' << mIdx++ << ") init ";
     ss_msg << "password=" << mPassword << ",";
-    ss_msg << "compression=" << (mCompression ? "on" : "off") << "\n";
+    ss_msg << "compression=" << (mCompression ? "zlib" : "off") << "\n";
     std::string msg_init = ss_msg.str();
     mSocket->Send(msg_init.c_str(), msg_init.size());
     info("version", [this](Packet* p) {

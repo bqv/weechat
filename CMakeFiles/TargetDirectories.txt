@@ -1,0 +1,9 @@
+C:/Users/frony/source/repos/Weechat++/CMakeFiles/INSTALL.dir
+C:/Users/frony/source/repos/Weechat++/CMakeFiles/ALL_BUILD.dir
+C:/Users/frony/source/repos/Weechat++/CMakeFiles/ZERO_CHECK.dir
+C:/Users/frony/source/repos/Weechat++/ZLib/CMakeFiles/zlib.dir
+C:/Users/frony/source/repos/Weechat++/ZLib/CMakeFiles/zlibstatic.dir
+C:/Users/frony/source/repos/Weechat++/ZLib/CMakeFiles/example.dir
+C:/Users/frony/source/repos/Weechat++/ZLib/CMakeFiles/minigzip.dir
+C:/Users/frony/source/repos/Weechat++/ZLib/CMakeFiles/INSTALL.dir
+C:/Users/frony/source/repos/Weechat++/ZLib/CMakeFiles/ALL_BUILD.dir

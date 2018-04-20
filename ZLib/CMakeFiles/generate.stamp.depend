@@ -1,0 +1,17 @@
+# CMake generation dependency list for this directory.
+C:/Users/frony/source/repos/Weechat++/ZLib/CMakeLists.txt
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckTypeSize.cmake
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckIncludeFile.cmake
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckIncludeFileCXX.cmake
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckFunctionExists.cmake
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckIncludeFile.cmake
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckCSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckIncludeFile.c.in
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckIncludeFile.c.in
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckIncludeFile.c.in
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckTypeSize.c.in
+C:/Users/frony/source/repos/Weechat++/CMakeFiles/CheckTypeSize/OFF64_T.c
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckFunctionExists.c
+C:/Program Files/CMake/share/cmake-3.11/Modules/CheckIncludeFile.c.in
+C:/Users/frony/source/repos/Weechat++/ZLib/zlib.pc.cmakein
+C:/Users/frony/source/repos/Weechat++/ZLib/zconf.h.cmakein
