@@ -41,10 +41,10 @@ public:
     template<typename T = CStringA>
     T GetRtf() const
     {
-        CStringA rtf = decode();
+        CStringA rtf = decodeRtf();
         return rtf;
     }
     
 private:
-    CStringA decode() const;
+    CStringA decodeRtf() const;
 };

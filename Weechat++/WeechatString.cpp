@@ -9,7 +9,7 @@ CWeechatString::~CWeechatString()
 {
 }
 
-std::string escape(std::string string)
+std::string escapeRtf(std::string string)
 {
     std::ostringstream out;
 
@@ -251,7 +251,7 @@ std::string escape(std::string string)
     return out.str();
 }
 
-CStringA translate(CString string)
+CStringA translateRtf(CString string)
 {
     static const std::string RE_COLOR_ATTRS("[*!/_|]*");
     static const std::string RE_COLOR_STD("(?:" + RE_COLOR_ATTRS + "\\d{2})");
@@ -298,7 +298,7 @@ CStringA translate(CString string)
         case '\x1C':
             break;
         default:
-            rtftext << escape(token);
+            rtftext << escapeRtf(token);
             break;
         }
     }
@@ -306,9 +306,9 @@ CStringA translate(CString string)
     return rtftext.str().c_str();
 }
 
-CStringA CWeechatString::decode() const
+CStringA CWeechatString::decodeRtf() const
 {
     CStringA rtf;
-    rtf.Format("%s", translate(m_raw));
+    rtf.Format("%s", translateRtf(m_raw));
     return rtf;
 }
