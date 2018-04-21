@@ -141,5 +141,5 @@ inline TCHAR GetPrintCharOrDot(TCHAR c)
 #ifdef _DEBUG
 #define DUMP				::UsrDump
 #else
-#define DUMP              1 ? (void)0 : ::UsrDump
+#define DUMP              0 ? (void)0 : ::UsrDump
 #endif

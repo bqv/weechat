@@ -80,6 +80,9 @@ std::string Packet::decompress(std::string& str, Compression compression)
             oss << "Exception during zlib decompression: (" << ret << ") "
                 << zs.msg;
             throw(std::runtime_error(oss.str()));
+#ifdef _DEBUG
+            ASSERT(AfxCheckMemory());
+#endif
         }
         return outstring;
         break;

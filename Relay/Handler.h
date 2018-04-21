@@ -16,6 +16,7 @@
 #define HPATH_LINE_DATA "line_data"
 #define VAR_LINES "lines"
 #define VAR_FIRST_LINE "first_line"
+#define VAR_LAST_LINE "last_line"
 #define VAR_DATA "data"
 #define PTR_GUI_BUFFERS "gui_buffers"
 #define BUFFER_POINTER "pointer"
