@@ -196,6 +196,7 @@
     <ClInclude Include="BufferLine.h" />
     <ClInclude Include="BufferView.h" />
     <ClInclude Include="ChildFrm.h" />
+    <ClInclude Include="CodePoint.h" />
     <ClInclude Include="ConnectDlg.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="InputCtrl.h" />
@@ -219,6 +220,7 @@
     <ClCompile Include="BufferCtrl.cpp" />
     <ClCompile Include="BufferLine.cpp" />
     <ClCompile Include="BufferView.cpp" />
+    <ClCompile Include="CodePoint.cpp" />
     <ClCompile Include="InputCtrl.cpp" />
     <ClCompile Include="ConnectDlg.cpp" />
     <ClCompile Include="RelayConnection.cpp" />

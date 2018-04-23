@@ -71,7 +71,7 @@ void Handler::init(const char* pPassword, bool pCompression)
 
 void Handler::handle(Packet pPacket)
 {
-    if (pPacket.id && pPacket.id.value().compare(0,1,"_") != 0)
+    if (pPacket.id && pPacket.id.value().compare(0, 1, "_") != 0)
     {
         unsigned long id;
         try
