@@ -1,12 +1,45 @@
 #include "stdafx.h"
 #include "WeechatString.h"
 
-#include <regex>
-#include <string>
 #include <sstream>
+#include <algorithm>
+
+const std::string CWeechatString::RE_COLOR_ATTRS("[*!/_|]*");
+const std::string CWeechatString::RE_COLOR_STD("(?:" + RE_COLOR_ATTRS + "\\d{2})");
+const std::string CWeechatString::RE_COLOR_EXT("(?:@" + RE_COLOR_ATTRS + "\\d{5})");
+const std::string CWeechatString::RE_COLOR_ANY("(?:" + RE_COLOR_STD + "|" + RE_COLOR_EXT + ")");
+// \x19: color code, \x1A: set attribute, \x1B: remove attribute, \x1C: reset
+const std::regex CWeechatString::RE_COLOR(
+    "("
+        "\x19(?:"
+            "\\d{2}"
+            "|F" + RE_COLOR_ANY + ""
+            "|B\\d{2}"
+            "|B@\\d{5}"
+            "|E"
+            "|\\\\*" + RE_COLOR_ANY + "(," + RE_COLOR_ANY + ")?"
+            "|@\\d{5}"
+            "|b."
+            "|\x1C"
+        ")"
+    ")"
+    "|\x1A."
+    "|\x1B."
+    "|\x1C"
+);
 
 CWeechatString::~CWeechatString()
 {
+}
+
+std::sregex_token_iterator CWeechatString::begin() const
+{
+    return std::sregex_token_iterator(m_wctext.begin(), m_wctext.end(), RE_COLOR, { -1, 0 });
+}
+
+std::sregex_token_iterator CWeechatString::end() const
+{
+    return std::sregex_token_iterator();
 }
 
 std::string escapeRtf(std::string string)
@@ -251,36 +284,12 @@ std::string escapeRtf(std::string string)
     return out.str();
 }
 
-CStringA translateRtf(CString string)
+CStringA CWeechatString::decodeRtf() const
 {
-    static const std::string RE_COLOR_ATTRS("[*!/_|]*");
-    static const std::string RE_COLOR_STD("(?:" + RE_COLOR_ATTRS + "\\d{2})");
-    static const std::string RE_COLOR_EXT("(?:@" + RE_COLOR_ATTRS + "\\d{5})");
-    static const std::string RE_COLOR_ANY("(?:" + RE_COLOR_STD + "|" + RE_COLOR_EXT + ")");
-    // \x19: color code, \x1A: set attribute, \x1B: remove attribute, \x1C: reset
-    static const std::regex RE_COLOR(
-        "("
-            "\x19(?:"
-                "\\d{2}"
-                "|F" + RE_COLOR_ANY + ""
-                "|B\\d{2}"
-                "|B@\\d{5}"
-                "|E"
-                "|\\\\*" + RE_COLOR_ANY + "(," + RE_COLOR_ANY + ")?"
-                "|@\\d{5}"
-                "|b."
-                "|\x1C"
-            ")"
-        ")"
-        "|\x1A."
-        "|\x1B."
-        "|\x1C"
-    );
-
-    std::string wctext = CT2A(string);
+    std::string wctext = CT2A(m_raw);
     std::ostringstream rtftext;
 
-    auto begin = std::sregex_token_iterator(wctext.begin(), wctext.end(), RE_COLOR, { -1, 0 });
+    auto begin = std::sregex_token_iterator(m_wctext.begin(), m_wctext.end(), RE_COLOR, { -1, 0 });
     auto end = std::sregex_token_iterator();
 
     for (std::sregex_token_iterator i = begin; i != end; ++i)
@@ -306,9 +315,33 @@ CStringA translateRtf(CString string)
     return rtftext.str().c_str();
 }
 
-CStringA CWeechatString::decodeRtf() const
+CString CWeechatString::decodePlain() const
 {
-    CStringA rtf;
-    rtf.Format("%s", translateRtf(m_raw));
-    return rtf;
+    std::ostringstream plaintext;
+
+    auto begin = std::sregex_token_iterator(m_wctext.begin(), m_wctext.end(), RE_COLOR, { -1, 0 });
+    auto end = std::sregex_token_iterator();
+
+    for (std::sregex_token_iterator i = begin; i != end; ++i)
+    {
+        std::ssub_match match = *i;
+        std::string token = match.str();
+        switch (token[0])
+        {
+        case '\x19':
+            break;
+        case '\x1A':
+            break;
+        case '\x1B':
+            break;
+        case '\x1C':
+            break;
+        default:
+            std::replace(token.begin(), token.end(), '\t', ' ');
+            plaintext << token;
+            break;
+        }
+    }
+
+    return CString(plaintext.str().c_str());
 }
