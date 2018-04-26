@@ -79,13 +79,13 @@ public:
 #endif
 
     template<typename T = CString>
-    T GetRaw() const
+    const T GetRaw() const
     {
         return m_raw;
     }
 
     template<typename T = CString>
-    T GetPlain() const
+    const T GetPlain() const
     {
         CString plain = decodePlain();
         return plain;
