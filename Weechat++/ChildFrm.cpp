@@ -75,8 +75,7 @@ void CChildFrame::OnMDIActivate(BOOL bActivate, CWnd* pActivateWnd, CWnd* pDeact
         CDocument* document = GetActiveDocument();
         ASSERT_KINDOF(CWeechatBuffer, document);
         CWeechatBuffer* buffer = (CWeechatBuffer*)document;
-        CString pointer = buffer->m_pointer;
-        parent->SendMessage(WM_SWITCH_BUFFER, (WPARAM)&pointer);
+        parent->SendMessage(WM_SWITCH_BUFFER, (WPARAM)buffer);
     }
 
     return CMDIChildWndEx::OnMDIActivate(bActivate, pActivateWnd, pDeactivateWnd);
