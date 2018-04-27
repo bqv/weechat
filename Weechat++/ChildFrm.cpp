@@ -6,6 +6,7 @@
 #include "Main.h"
 
 #include "ChildFrm.h"
+#include "WeechatBuffer.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -16,6 +17,7 @@
 IMPLEMENT_DYNCREATE(CChildFrame, CMDIChildWndEx)
 
 BEGIN_MESSAGE_MAP(CChildFrame, CMDIChildWndEx)
+    ON_WM_MDIACTIVATE()
 END_MESSAGE_MAP()
 
 // CChildFrame construction/destruction
@@ -64,6 +66,21 @@ void CChildFrame::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 // CChildFrame message handlers
+
+void CChildFrame::OnMDIActivate(BOOL bActivate, CWnd* pActivateWnd, CWnd* pDeactivateWnd)
+{
+    if (bActivate && pActivateWnd == this)
+    {
+        CWnd* parent = theApp.m_pMainWnd;
+        CDocument* document = GetActiveDocument();
+        ASSERT_KINDOF(CWeechatBuffer, document);
+        CWeechatBuffer* buffer = (CWeechatBuffer*)document;
+        CString pointer = buffer->m_pointer;
+        parent->SendMessage(WM_SWITCH_BUFFER, (WPARAM)&pointer);
+    }
+
+    return CMDIChildWndEx::OnMDIActivate(bActivate, pActivateWnd, pDeactivateWnd);
+}
 
 void CChildFrame::DoDataExchange(CDataExchange* pDX)
 {

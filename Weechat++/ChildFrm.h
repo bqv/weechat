@@ -35,5 +35,6 @@ public:
 
     // Generated message map functions
 protected:
+    afx_msg void OnMDIActivate(BOOL bActivate, CWnd* pActivateWnd, CWnd* pDeactivateWnd);
     DECLARE_MESSAGE_MAP()
 };

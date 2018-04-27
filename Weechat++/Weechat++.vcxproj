@@ -200,6 +200,7 @@
     <ClInclude Include="ConnectDlg.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="InputCtrl.h" />
+    <ClInclude Include="Nicklist.h" />
     <ClInclude Include="RelayConnection.h" />
     <ClInclude Include="RelaySslSocket.h" />
     <ClInclude Include="Settings.h" />
@@ -224,6 +225,7 @@
     <ClCompile Include="CodePoint.cpp" />
     <ClCompile Include="InputCtrl.cpp" />
     <ClCompile Include="ConnectDlg.cpp" />
+    <ClCompile Include="Nicklist.cpp" />
     <ClCompile Include="RelayConnection.cpp" />
     <ClCompile Include="RelaySocket.cpp" />
     <ClCompile Include="MainFrm.cpp" />

@@ -18,11 +18,24 @@ CNicklistView::~CNicklistView()
 {
 }
 
+void CNicklistView::SetNicks(CNicklist& nicklist)
+{
+    for (int i = 0; i < nicklist.m_items.GetCount(); ++i)
+    {
+        const CNicklistItem& item = nicklist.m_items[i];
+        m_wndNicklistView.InsertItem(m_wndNicklistView.GetItemCount(), item.m_prefix + item.m_name);
+    }
+    for (int i = 0; i < nicklist.m_sublists.GetCount(); ++i)
+    {
+        SetNicks(nicklist.m_sublists[i]);
+    }
+}
 
 BEGIN_MESSAGE_MAP(CNicklistView, CDockablePane)
     ON_WM_CREATE()
     ON_WM_SIZE()
     ON_WM_CONTEXTMENU()
+    ON_MESSAGE(WM_UPDATE_NICKLIST, &CNicklistView::OnUpdateNicklist)
 END_MESSAGE_MAP()
 
 
@@ -46,12 +59,6 @@ int CNicklistView::OnCreate(LPCREATESTRUCT lpCreateStruct)
         return -1;      // fail to create
     }
 
-    ///
-    m_wndNicklistView.InsertItem(0, _T("User1"));
-    m_wndNicklistView.InsertItem(1, _T("User2"));
-    m_wndNicklistView.InsertItem(2, _T("User3"));
-    m_wndNicklistView.InsertItem(3, _T("User4"));
-    ///
     AdjustLayout();
 
     return 0;
@@ -90,6 +97,28 @@ void CNicklistView::OnContextMenu(CWnd* pWnd, CPoint point)
 
     pWndList->SetFocus();
     theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
+}
+
+LRESULT CNicklistView::OnUpdateNicklist(WPARAM wp, LPARAM lp)
+{
+    switch (wp)
+    {
+    case NICKLIST_REPLACE:
+    {
+        CNicklist& nicklist = *(CNicklist*)lp;
+        m_wndNicklistView.DeleteAllItems();
+        m_wndNicklistView.RemoveAllGroups();
+        SetNicks(nicklist);
+        break;
+    }
+    case NICKLIST_DIFF:
+        break;
+    default:
+        AfxThrowInvalidArgException();
+        break;
+    }
+
+    return TRUE;
 }
 
 void CNicklistView::AdjustLayout()
