@@ -202,6 +202,7 @@
     <ClInclude Include="InputCtrl.h" />
     <ClInclude Include="RelayConnection.h" />
     <ClInclude Include="RelaySslSocket.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="SslSocket.h" />
     <ClInclude Include="NicklistView.h" />
     <ClInclude Include="RelaySocket.h" />
@@ -229,6 +230,7 @@
     <ClCompile Include="ChildFrm.cpp" />
     <ClCompile Include="NicklistView.cpp" />
     <ClCompile Include="RelaySslSocket.cpp" />
+    <ClCompile Include="Settings.cpp" />
     <ClCompile Include="SslSocket.cpp" />
     <ClCompile Include="WeechatEditCtrl.cpp" />
     <ClCompile Include="WeechatString.cpp" />
